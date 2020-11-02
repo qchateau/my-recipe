@@ -1,0 +1,64 @@
+version: "3.2"
+
+volumes:
+  db_data:
+  django:
+  django_static:
+
+services:
+  nginx:
+    restart: always
+    image: nginx:1.19
+    volumes:
+      - django:/shared/
+      - django_static:/backend_static/
+      - ./nginx:/etc/nginx/templates
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+      - frontend
+
+  frontend:
+    restart: always
+    image: frontend:latest
+    build:
+      context: ./vue/
+    volumes:
+      - ./vue/myrecipe/:/code/
+      - /code/node_modules # otherwise we will override the image node_modules with our own
+    command: sh -c 'cd /code/ && npm install && npm run dev'
+
+  backend:
+    restart: always
+    image: backend:latest
+    build:
+      context: ./django/
+    environment:
+      - DJANGO_DEBUG=${DJANGO_DEBUG:?Django debug is not set}
+      - DJANGO_SECRET=${DJANGO_SECRET:?Django secret is not set}
+      - GOOGLE_AUTH_CLIENT_ID=${GOOGLE_AUTH_CLIENT_ID:?Google auth client ID is not set}
+      - GOOGLE_AUTH_SECRET=${GOOGLE_AUTH_SECRET:?Google auth secret is not set}
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+    volumes:
+      - django:/shared/
+      - django_static:/static/
+      - ./django/:/code/:rw # to write migrations on host project
+    depends_on:
+      - db
+    stop_signal: SIGINT
+    command: sh -c '
+      python3 manage.py collectstatic --no-input &&
+      python3 manage.py makemigrations &&
+      python3 manage.py migrate &&
+      uwsgi --socket /shared/django.sock --chmod=666 --module myrecipe.wsgi --py-autoreload=1'
+
+  db:
+    restart: always
+    image: postgres:11
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+    volumes:
+      - db_data:/var/lib/postgresql/data
