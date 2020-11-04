@@ -23,3 +23,18 @@ class RecipeIngredient(models.Model):
     recipe = models.ForeignKey(
         Recipe, on_delete=models.CASCADE, related_name="ingredients"
     )
+
+
+class ViewPermission(models.Model):
+    class Meta:
+        unique_together = ["user_from", "user_to"]
+
+    user_from = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        editable=False,
+        on_delete=models.CASCADE,
+        related_name="view_permissions",
+    )
+    user_to = models.ForeignKey(
+        settings.AUTH_USER_MODEL, editable=False, on_delete=models.CASCADE
+    )

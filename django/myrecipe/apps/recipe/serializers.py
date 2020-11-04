@@ -1,20 +1,35 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 
-from .models import Recipe, RecipeIngredient
+from . import models
+
+
+class ViewPermissionUserToEmailSerializer(serializers.BaseSerializer):
+    def to_representation(self, instance):
+        return instance.user_to.email
 
 
 class UserSerializer(serializers.ModelSerializer):
+    view_permissions = ViewPermissionUserToEmailSerializer(many=True)
+
     class Meta:
         model = User
-        fields = ["username", "first_name", "last_name"]
+        fields = [
+            "id",
+            "url",
+            "username",
+            "first_name",
+            "last_name",
+            "email",
+            "view_permissions",
+        ]
 
 
 class RecipeIngredientSerializer(serializers.ModelSerializer):
     id = serializers.ReadOnlyField()
 
     class Meta:
-        model = RecipeIngredient
+        model = models.RecipeIngredient
         fields = ["id", "name", "quantity", "unit"]
 
 
@@ -24,14 +39,14 @@ class RecipeSerializer(serializers.ModelSerializer):
     ingredients = RecipeIngredientSerializer(many=True, default=list)
 
     class Meta:
-        model = Recipe
+        model = models.Recipe
         fields = "__all__"
 
     def create(self, validated_data):
         ingredients = validated_data.pop("ingredients")
-        recipe = Recipe.objects.create(**validated_data)
+        recipe = models.Recipe.objects.create(**validated_data)
         for ingredient in ingredients:
-            RecipeIngredient.objects.create(recipe=recipe, **ingredient)
+            models.RecipeIngredient.objects.create(recipe=recipe, **ingredient)
         return recipe
 
     def update(self, instance, validated_data):
@@ -43,5 +58,11 @@ class RecipeSerializer(serializers.ModelSerializer):
 
         instance.ingredients.all().delete()
         for ingredient in ingredients:
-            RecipeIngredient.objects.create(recipe=instance, **ingredient)
+            models.RecipeIngredient.objects.create(recipe=instance, **ingredient)
         return instance
+
+
+class ViewPermissionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.ViewPermission
+        fields = "__all__"

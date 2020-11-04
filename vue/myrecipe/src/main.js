@@ -10,6 +10,7 @@ import VuetifyToast from 'vuetify-toast-snackbar'
 
 import App from './App'
 import router from './router'
+import UserPlugin from '@/js/user.js'
 
 axios.defaults.xsrfCookieName = 'csrftoken'
 axios.defaults.xsrfHeaderName = 'X-CSRFTOKEN'
@@ -18,6 +19,7 @@ const vuetify = new Vuetify()
 
 Vue.config.productionTip = false
 Vue.use(Vuetify)
+Vue.use(UserPlugin)
 
 Vue.use(VuetifyToast, {
   $vuetify: vuetify.framework,

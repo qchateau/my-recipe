@@ -33,7 +33,14 @@
         <v-btn fab dark small color="indigo" @click="scaleDrawer = !scaleDrawer">
           <v-icon>mdi-scale</v-icon>
         </v-btn>
-        <v-btn fab dark small color="green" @click="$router.push('/edit-recipe/'+id+'/')">
+        <v-btn
+          fab
+          dark
+          small
+          color="green"
+          @click="$router.push('/edit-recipe/'+id+'/')"
+          v-if="editable"
+        >
           <v-icon>mdi-playlist-edit</v-icon>
         </v-btn>
         <v-btn fab dark small color="red" @click="onDelete">
@@ -87,6 +94,11 @@ export default {
       } catch (exc) {
         this.$toast.error('Failed to delete recipe.')
       }
+    }
+  },
+  computed: {
+    editable () {
+      return this.$user.loggedIn() && this.data.author.email === this.$user.data.email
     }
   }
 }

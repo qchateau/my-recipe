@@ -58,7 +58,7 @@
 import axios from 'axios'
 
 export default {
-  name: 'RecipeDetails',
+  name: 'EditRecipe',
   props: {
     editId: {
       default: false

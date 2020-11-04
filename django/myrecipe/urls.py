@@ -8,8 +8,9 @@ from .apps.recipe import views
 
 router = routers.DefaultRouter()
 router.register("recipes", views.RecipeViewSet)
-router.register("recipe-ingredients", views.RecipeIngredientsViewSet)
+router.register("recipe-ingredients", views.RecipeIngredientViewSet)
 router.register("users", views.UserViewSet)
+router.register("view-permissions", views.ViewPermissionViewSet)
 
 urlpatterns = [
     path("backend/admin/", admin.site.urls),
