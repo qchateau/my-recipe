@@ -3,3 +3,6 @@ django-allauth==0.43.0
 djangorestframework==3.12.1
 psycopg2==2.8.6
 uwsgi==2.0.19.1
+django-resized==0.3.11
+Pillow==8.0.1
+django-cleanup==5.1.0

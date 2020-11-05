@@ -18,6 +18,7 @@
 
 <script>
 import axios from 'axios'
+import tools from '@/js/tools.js'
 
 const localRecipeUrlRegexPattern = window.location.origin.replaceAll('/', '\\/').replaceAll('.', '\\.') + '.*\\/recipe\\/(.*)(\\/.*)?'
 const localRecipeUrlRegex = new RegExp(localRecipeUrlRegexPattern)
@@ -52,7 +53,18 @@ export default {
     async importLocalRecipe (url) {
       let id = url.match(localRecipeUrlRegex)[1]
       let data = (await axios.get('/backend/recipes/' + id + '/')).data
-      await axios.post('/backend/recipes/', data)
+
+      const formData = new FormData()
+      for (const [key, value] of Object.entries(data)) {
+        if (key === 'image' && value !== null) {
+          let imageBlob = new Blob([(await axios.get(value, {responseType: 'blob'})).data])
+          formData.append(key, imageBlob, tools.uuid4() + '.png')
+        } else {
+          formData.append(key, value)
+        }
+      }
+
+      await axios.post('/backend/recipes/', formData)
       this.$router.push('/edit-recipe/' + id)
     }
   }

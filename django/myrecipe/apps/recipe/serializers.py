@@ -6,13 +6,13 @@ from . import models
 User = get_user_model()
 
 
-class UserSerializer(serializers.ModelSerializer):
+class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = User
-        fields = ["id", "url", "username", "first_name", "last_name", "email"]
+        fields = ["id", "username", "first_name", "last_name", "email"]
 
 
-class RecipeIngredientSerializer(serializers.ModelSerializer):
+class RecipeIngredientSerializer(serializers.HyperlinkedModelSerializer):
     id = serializers.ReadOnlyField()
 
     class Meta:
@@ -20,7 +20,7 @@ class RecipeIngredientSerializer(serializers.ModelSerializer):
         fields = ["id", "name", "quantity", "unit"]
 
 
-class RecipeSerializer(serializers.ModelSerializer):
+class RecipeSerializer(serializers.HyperlinkedModelSerializer):
     id = serializers.ReadOnlyField()
     author = UserSerializer(read_only=True)
     ingredients = RecipeIngredientSerializer(many=True, default=list)

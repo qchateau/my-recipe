@@ -59,6 +59,8 @@ INSTALLED_APPS = [
     "allauth.socialaccount.providers.google",
     # local project
     "myrecipe.apps.recipe",
+    # let cleanup last
+    "django_cleanup",
 ]
 
 MIDDLEWARE = [
@@ -143,6 +145,9 @@ USE_TZ = True
 
 STATIC_URL = "/backend/static/"
 STATIC_ROOT = "/static/"
+
+MEDIA_URL = "/backend/media/"
+MEDIA_ROOT = "/media/"
 
 # Rest Framework
 

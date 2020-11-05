@@ -10,7 +10,14 @@
       <v-form ref="form" v-model="valid">
         <v-text-field v-model="data.name" :counter="250" :rules="nameRules" label="Name" required></v-text-field>
 
-        <v-textarea rows="1" auto-grow v-model="data.description" label="Description"></v-textarea>
+        <v-textarea rows="1" auto-grow v-model="data.description" label="Description" required></v-textarea>
+
+        <v-file-input
+          v-model="images"
+          accept="image/*"
+          prepend-icon="mdi-image"
+          label="Picture (5MB max)"
+        ></v-file-input>
 
         <v-checkbox v-model="data.public" label="Public (people with link can view)"></v-checkbox>
 
@@ -47,10 +54,18 @@
             </v-row>
           </v-card-text>
         </v-card>
-
-        <v-btn :disabled="!valid" color="success" @click="createOrUpdate" block>
-          <v-icon>mdi-check</v-icon>
-        </v-btn>
+        <v-row>
+          <v-col :cols="6">
+            <v-btn @click="$router.push('/recipe/'+editId)" block>
+              <v-icon>mdi-close</v-icon>
+            </v-btn>
+          </v-col>
+          <v-col :cols="6">
+            <v-btn :disabled="!valid" color="success" @click="createOrUpdate" block>
+              <v-icon>mdi-check</v-icon>
+            </v-btn>
+          </v-col>
+        </v-row>
       </v-form>
     </div>
   </div>
@@ -58,6 +73,7 @@
 
 <script>
 import axios from 'axios'
+import tools from '@/js/tools.js'
 
 export default {
   name: 'EditRecipe',
@@ -69,6 +85,7 @@ export default {
   data () {
     return {
       data: null,
+      images: [],
       valid: true,
       nameRules: [
         v => !!v || 'Name is required',
@@ -94,6 +111,7 @@ export default {
       this.data = {
         name: '',
         description: '',
+        public: true,
         ingredients: []
       }
     }
@@ -155,18 +173,22 @@ export default {
       this.data.ingredients = this.data.ingredients.filter(i => i.key !== ingredient.key)
     },
     generatePostData () {
-      let data = {
-        name: this.data.name,
-        description: this.data.description,
-        public: this.data.public,
-        ingredients: []
-      }
+      let ingredients = []
 
       for (let ingredient of this.data.ingredients) {
         if (ingredient.name === '') {
           continue
         }
-        data.ingredients.push(ingredient)
+        ingredients.push(ingredient)
+      }
+
+      const data = new FormData()
+      data.append('name', this.data.name)
+      data.append('description', this.data.description)
+      data.append('public', this.data.public)
+      data.append('ingredients', ingredients)
+      if (this.images.length > 0) {
+        data.append('image', this.images[0], tools.uuid4() + '.png')
       }
       return data
     }

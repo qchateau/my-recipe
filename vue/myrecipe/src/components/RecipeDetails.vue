@@ -11,6 +11,10 @@
       </div>
 
       <v-card-text>
+        <div style="text-align: center">
+          <img :src="data.image" width="256" style="border-radius: 5%" v-if="data.image" />
+        </div>
+
         <v-card id="ingredients-card" v-if="data.ingredients.length > 0" style="min-height: 45px">
           <div style="float: right; margin: 5px"></div>
           <ul>
@@ -20,6 +24,7 @@
             >{{ Math.round(ingredient.quantity * quantityScale * 100) / 100 }} {{ ingredient.unit }} {{ ingredient.name }}</li>
           </ul>
         </v-card>
+
         <div>{{ data.description }}</div>
       </v-card-text>
 

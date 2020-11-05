@@ -2,6 +2,7 @@ import uuid
 
 from django.db import models
 from django.conf import settings
+from django_resized import ResizedImageField
 
 
 class Recipe(models.Model):
@@ -17,6 +18,13 @@ class Recipe(models.Model):
 
     name = models.CharField(max_length=255)
     description = models.TextField()
+    image = ResizedImageField(
+        upload_to="images/%Y/%m/%d/",
+        blank=True,
+        max_length=255,
+        size=[256, 256],
+        force_format="PNG",
+    )
     public = models.BooleanField(default=True)
 
 

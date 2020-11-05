@@ -6,12 +6,21 @@
 
     <v-text-field hide-details label="Search" v-model="nameSearch"></v-text-field>
 
-    <v-list>
-      <template v-for="recipe in filteredRecipeList">
-        <v-list-item :key="'item'+recipe.id" @click="$router.push('recipe/' + recipe.id)">
-          <v-list-item-title>{{recipe.name}}</v-list-item-title>
-        </v-list-item>
-      </template>
+    <v-list dense>
+      <v-list-item
+        v-for="recipe in filteredRecipeList"
+        :key="'item'+recipe.id"
+        @click="$router.push('recipe/' + recipe.id)"
+      >
+        <v-list-item-content>
+          <v-list-item-title>{{ recipe.name }}</v-list-item-title>
+          <v-list-item-subtitle>{{ recipe.author.first_name }} {{ recipe.author.last_name }}</v-list-item-subtitle>
+        </v-list-item-content>
+
+        <v-list-item-avatar v-if="recipe.image">
+          <img :src="recipe.image" />
+        </v-list-item-avatar>
+      </v-list-item>
     </v-list>
 
     <v-footer fixed>

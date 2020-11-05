@@ -3,6 +3,7 @@ version: "3.2"
 volumes:
   db_data:
   django:
+  django_media:
   django_static:
 
 services:
@@ -12,6 +13,7 @@ services:
     volumes:
       - django:/shared/
       - django_static:/backend_static/
+      - django_media:/backend_media/
       - ./nginx:/etc/nginx/templates
     ports:
       - "8080:80"
@@ -44,6 +46,7 @@ services:
     volumes:
       - django:/shared/
       - django_static:/static/
+      - django_media:/media/
       - ./django/:/code/:rw # to write migrations on host project
     depends_on:
       - db
