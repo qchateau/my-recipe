@@ -29,11 +29,10 @@ services:
     environment:
       - DEBUG=${DEBUG:?Debug is not set}
     volumes:
-      - ./vue/myrecipe/:/code/
-      - /code/node_modules # otherwise we will override the image node_modules with our own
-      - /code/dist # otherwise we will override the image dist
+      - ./vue/myrecipe/:/devcode/
+      - /devcode/node_modules # otherwise we will override the image node_modules with our own
     command: sh -c '
-      if [ "$DEBUG" -eq "1" ]; then cd /code/ && npm install && npm run dev; else http-server /code/dist; fi'
+      if [ "$DEBUG" -eq "1" ]; then cd /devcode/ && npm install && npm run dev; else http-server /code/dist; fi'
 
   backend:
     restart: always
