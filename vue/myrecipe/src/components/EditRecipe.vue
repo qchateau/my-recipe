@@ -12,6 +12,8 @@
 
         <v-textarea rows="1" auto-grow v-model="data.description" label="Description"></v-textarea>
 
+        <v-checkbox v-model="data.public" label="Public (people with link can view)"></v-checkbox>
+
         <h4>Ingredients</h4>
 
         <v-card
@@ -122,7 +124,7 @@ export default {
     },
     async update () {
       try {
-        await axios.patch('/backend/recipes/' + this.data.id + '/', this.generatePostData())
+        await axios.put('/backend/recipes/' + this.data.id + '/', this.generatePostData())
         this.$toast.success('Recipe updated.')
       } catch (exc) {
         console.error(exc)
@@ -156,6 +158,7 @@ export default {
       let data = {
         name: this.data.name,
         description: this.data.description,
+        public: this.data.public,
         ingredients: []
       }
 
@@ -177,14 +180,4 @@ export default {
 </script>
 
 <style scoped>
-ul {
-  margin-block-start: 0px;
-  margin-block-end: 0px;
-}
-#ingredients-card {
-  margin: 0px 10px 20px 10px;
-}
-#recipe-header {
-  text-align: center;
-}
 </style>

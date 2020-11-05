@@ -1,10 +1,12 @@
-from django.contrib.auth.models import User
 from rest_framework import viewsets
 from rest_framework import permissions
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from django.contrib.auth import get_user_model
 
 from . import models, serializers
+
+User = get_user_model()
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -15,82 +17,53 @@ class UserViewSet(viewsets.ModelViewSet):
     def current(self, request):
         return Response(self.get_serializer((request.user)).data)
 
-    @action(
-        detail=False,
-        methods=["post"],
-        permission_classes=[permissions.IsAuthenticated],
-        url_path="give-permission",
-    )
-    def give_permission(self, request):
-        user_from = request.user
-        user_to = self.get_queryset().get(email=request.data["email"])
-        models.ViewPermission.objects.get_or_create(
-            user_from=user_from, user_to=user_to
-        )
-        return Response()
-
-    @action(
-        detail=False,
-        methods=["post"],
-        permission_classes=[permissions.IsAuthenticated],
-        url_path="revoke-permission",
-    )
-    def revoke_permission(self, request):
-        user_from = request.user
-        user_to = self.get_queryset().get(email=request.data["email"])
-        models.ViewPermission.objects.get(user_from=user_from, user_to=user_to).delete()
-        return Response()
-
 
 class RecipeViewSet(viewsets.ModelViewSet):
-    queryset = models.Recipe.objects.all().order_by("id")
+    queryset = models.Recipe.objects.all().order_by("created_at")
     serializer_class = serializers.RecipeSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
-    def perform_update(self, serializer):
-        self._verify_is_author()
-        return super().perform_update(serializer)
-
-    def perform_destroy(self, instance):
-        self._verify_is_author()
-        return super().perform_destroy(instance)
-
-    def get_queryset(self):
+    def list(self, request, *_, **__):
         user = self.request.user
-        queryset = super().get_queryset()
 
+        queryset = self.get_queryset()
         if not user.is_superuser:
-            allowed_authors = [user] + list(
-                User.objects.filter(view_permissions__user_to=user)
-            )
-            queryset = queryset.filter(author__in=allowed_authors)
+            queryset = queryset.filter(author=user)
+        queryset = self.filter_queryset(queryset)
 
-        name_search = self.request.query_params.get("name-search", None)
-        if name_search is not None:
-            queryset = queryset.filter(name__icontains=name_search)
-        return queryset
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
 
-    def _verify_is_author(self):
-        user = self.request.user
-        if user.is_superuser:
-            return
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
-        if self.get_object().author != user:
+    def check_object_permissions(self, request, obj):
+        super().check_object_permissions(request, obj)
+        user_is_author = request.user.is_superuser or obj.author == request.user
+
+        if (not user_is_author) and (
+            request.method not in permissions.SAFE_METHODS or not obj.public
+        ):
             self.permission_denied(
                 self.request,
                 message="You do not have permission to perform this action.",
                 code=403,
             )
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+
+        name_search = self.request.query_params.get("name-search", None)
+        if name_search is not None:
+            queryset = queryset.filter(name__icontains=name_search)
+        return queryset
+
 
 class RecipeIngredientViewSet(viewsets.ModelViewSet):
     queryset = models.RecipeIngredient.objects.all().order_by("id")
     serializer_class = serializers.RecipeIngredientSerializer
-
-
-class ViewPermissionViewSet(viewsets.ModelViewSet):
-    queryset = models.ViewPermission.objects.all().order_by("id")
-    serializer_class = serializers.ViewPermissionSerializer

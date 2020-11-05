@@ -3,7 +3,7 @@ import Router from 'vue-router'
 import RecipeList from '@/components/RecipeList'
 import RecipeDetails from '@/components/RecipeDetails'
 import EditRecipe from '@/components/EditRecipe'
-import Share from '@/components/Share'
+import ImportRecipe from '@/components/ImportRecipe'
 
 Vue.use(Router)
 
@@ -36,9 +36,9 @@ export default new Router({
       props: true
     },
     {
-      path: '/share',
-      name: 'Share',
-      component: Share
+      path: '/import-recipe/',
+      name: 'ImportRecipe',
+      component: ImportRecipe
     }
   ]
 })

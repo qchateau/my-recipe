@@ -27,23 +27,30 @@
         <template v-slot:activator>
           <v-btn v-model="fab" color="blue darken-2" dark fab>
             <v-icon v-if="fab">mdi-close</v-icon>
-            <v-icon v-else>mdi-pencil</v-icon>
+            <v-icon v-else>mdi-plus</v-icon>
           </v-btn>
         </template>
+
         <v-btn fab dark small color="indigo" @click="scaleDrawer = !scaleDrawer">
           <v-icon>mdi-scale</v-icon>
         </v-btn>
+
+        <v-btn fab dark small color="indigo" @click="onShare" v-if="data.public">
+          <v-icon>mdi-share</v-icon>
+        </v-btn>
+
         <v-btn
           fab
           dark
           small
           color="green"
           @click="$router.push('/edit-recipe/'+id+'/')"
-          v-if="editable"
+          v-if="owner"
         >
           <v-icon>mdi-playlist-edit</v-icon>
         </v-btn>
-        <v-btn fab dark small color="red" @click="onDelete">
+
+        <v-btn fab dark small color="red" @click="deleteDialog = true" v-if="owner">
           <v-icon>mdi-delete</v-icon>
         </v-btn>
       </v-speed-dial>
@@ -55,6 +62,18 @@
         <v-text-field v-model="quantityScale" hide-details single-line type="number" />
       </div>
     </v-navigation-drawer>
+
+    <v-dialog v-model="deleteDialog" persistent max-width="290">
+      <v-card>
+        <v-card-title class="headline">Delete recipe</v-card-title>
+        <v-card-text>This will permanently delete the recipe.</v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn text @click="deleteDialog = false">Cancel</v-btn>
+          <v-btn color="red darken-1" text @click="doDelete(); deleteDialog = false">Delete</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -69,24 +88,21 @@ export default {
       data: null,
       quantityScale: 1,
       scaleDrawer: false,
-      fab: false
+      fab: false,
+      deleteDialog: false
     }
   },
   async mounted () {
-    this.data = (await axios.get('/backend/recipes/' + this.id + '/')).data
+    try {
+      this.data = (await axios.get('/backend/recipes/' + this.id + '/')).data
+    } catch (exc) {
+      console.error(exc)
+      this.$toast.error('Failed to get recipe.')
+      this.$router.push('/')
+    }
   },
   methods: {
-    async onDelete () {
-      try {
-        await this.$confirm('This will permanently delete the recipe. Continue ?', 'Warning', {
-          confirmButtonText: 'OK',
-          cancelButtonText: 'Cancel',
-          type: 'warning'
-        })
-      } catch (exc) {
-        return
-      }
-
+    async doDelete () {
       try {
         await axios.delete('/backend/recipes/' + this.id + '/')
         this.$toast.success('Recipe deleted.')
@@ -94,10 +110,14 @@ export default {
       } catch (exc) {
         this.$toast.error('Failed to delete recipe.')
       }
+    },
+    async onShare () {
+      await navigator.clipboard.writeText(location.href)
+      this.$toast.success('Recipe URL copied to clipboard')
     }
   },
   computed: {
-    editable () {
+    owner () {
       return this.$user.loggedIn() && this.data.author.email === this.$user.data.email
     }
   }

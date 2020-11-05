@@ -1,8 +1,11 @@
+import uuid
+
 from django.db import models
 from django.conf import settings
 
 
 class Recipe(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     author = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         editable=False,
@@ -14,6 +17,7 @@ class Recipe(models.Model):
 
     name = models.CharField(max_length=255)
     description = models.TextField()
+    public = models.BooleanField(default=True)
 
 
 class RecipeIngredient(models.Model):
@@ -22,19 +26,4 @@ class RecipeIngredient(models.Model):
     unit = models.CharField(max_length=100, default="", blank=True)
     recipe = models.ForeignKey(
         Recipe, on_delete=models.CASCADE, related_name="ingredients"
-    )
-
-
-class ViewPermission(models.Model):
-    class Meta:
-        unique_together = ["user_from", "user_to"]
-
-    user_from = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        editable=False,
-        on_delete=models.CASCADE,
-        related_name="view_permissions",
-    )
-    user_to = models.ForeignKey(
-        settings.AUTH_USER_MODEL, editable=False, on_delete=models.CASCADE
     )

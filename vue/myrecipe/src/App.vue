@@ -18,8 +18,8 @@
           <v-list-item-title>New recipe</v-list-item-title>
         </v-list-item>
 
-        <v-list-item @click="drawer = false; $router.push('/share')">
-          <v-list-item-title>Share</v-list-item-title>
+        <v-list-item @click="drawer = false; $router.push('/import-recipe')">
+          <v-list-item-title>Import recipe</v-list-item-title>
         </v-list-item>
       </v-list>
     </v-navigation-drawer>
