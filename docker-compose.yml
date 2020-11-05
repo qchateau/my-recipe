@@ -16,7 +16,7 @@ services:
       - django_media:/backend_media/
       - ./nginx:/etc/nginx/templates
     ports:
-      - "8080:80"
+      - "${HTTP_PORT:?HTTP port is not set}:80"
     depends_on:
       - backend
       - frontend
@@ -26,10 +26,14 @@ services:
     image: frontend:latest
     build:
       context: ./vue/
+    environment:
+      - DEBUG=${DEBUG:?Debug is not set}
     volumes:
       - ./vue/myrecipe/:/code/
       - /code/node_modules # otherwise we will override the image node_modules with our own
-    command: sh -c 'cd /code/ && npm install && npm run dev'
+      - /code/dist # otherwise we will override the image dist
+    command: sh -c '
+      if [ "$DEBUG" -eq "1" ]; then cd /code/ && npm install && npm run dev; else http-server /code/dist; fi'
 
   backend:
     restart: always
@@ -37,7 +41,7 @@ services:
     build:
       context: ./django/
     environment:
-      - DJANGO_DEBUG=${DJANGO_DEBUG:?Django debug is not set}
+      - DJANGO_DEBUG=${DEBUG:?Debug is not set}
       - DJANGO_SECRET=${DJANGO_SECRET:?Django secret is not set}
       - GOOGLE_AUTH_CLIENT_ID=${GOOGLE_AUTH_CLIENT_ID:?Google auth client ID is not set}
       - GOOGLE_AUTH_SECRET=${GOOGLE_AUTH_SECRET:?Google auth secret is not set}
@@ -50,12 +54,11 @@ services:
       - ./django/:/code/:rw # to write migrations on host project
     depends_on:
       - db
-    stop_signal: SIGINT
     command: sh -c '
       python3 manage.py collectstatic --no-input &&
       python3 manage.py makemigrations &&
       python3 manage.py migrate &&
-      uwsgi --socket /shared/django.sock --chmod=666 --module myrecipe.wsgi --py-autoreload=1'
+      uwsgi --socket /shared/django.sock --chmod=666 --module myrecipe.wsgi --py-autoreload=$$DJANGO_DEBUG'
 
   db:
     restart: always
