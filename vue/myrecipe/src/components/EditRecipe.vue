@@ -13,7 +13,7 @@
         <v-textarea rows="1" auto-grow v-model="data.description" label="Description" required></v-textarea>
 
         <v-file-input
-          v-model="images"
+          v-model="image"
           accept="image/*"
           prepend-icon="mdi-image"
           label="Picture (5MB max)"
@@ -85,7 +85,7 @@ export default {
   data () {
     return {
       data: null,
-      images: [],
+      image: null,
       valid: true,
       nameRules: [
         v => !!v || 'Name is required',
@@ -187,8 +187,8 @@ export default {
       data.append('description', this.data.description)
       data.append('public', this.data.public)
       data.append('ingredients', ingredients)
-      if (this.images.length > 0) {
-        data.append('image', this.images[0], tools.uuid4() + '.png')
+      if (this.image) {
+        data.append('image', this.image, tools.uuid4() + '.png')
       }
       return data
     }
