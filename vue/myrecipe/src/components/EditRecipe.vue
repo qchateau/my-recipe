@@ -49,11 +49,13 @@
                   label="Unit"
                 />
               </v-col>
-              <v-col cols="2" md="1">
+
+              <v-col cols="2" md="1" v-if="!$vuetify.breakpoint.mdAndUp">
                 <v-btn small @click="removeIngredient(ingredient)" color="error darken-1">
                   <v-icon>mdi-delete</v-icon>
                 </v-btn>
               </v-col>
+
               <v-col cols="12" md="6">
                 <v-text-field
                   dense
@@ -62,6 +64,12 @@
                   single-line
                   label="Ingredient"
                 />
+              </v-col>
+
+              <v-col cols="2" md="1" v-if="$vuetify.breakpoint.mdAndUp">
+                <v-btn small @click="removeIngredient(ingredient)" color="error darken-1" block>
+                  <v-icon>mdi-delete</v-icon>
+                </v-btn>
               </v-col>
             </v-row>
           </v-card-text>

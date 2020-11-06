@@ -30,7 +30,7 @@
     </v-navigation-drawer>
 
     <v-main>
-      <v-container fluid>
+      <v-container fluid style="max-width:1000px">
         <router-view></router-view>
       </v-container>
     </v-main>
