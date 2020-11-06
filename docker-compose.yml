@@ -14,6 +14,7 @@ services:
       - django:/shared/
       - django_static:/backend_static/
       - django_media:/backend_media/
+      - ./nginx/favicon.ico:/favicon.ico
       - ./nginx:/etc/nginx/templates
     ports:
       - "${HTTP_PORT:?HTTP port is not set}:80"
