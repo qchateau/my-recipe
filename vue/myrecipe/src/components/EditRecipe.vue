@@ -156,10 +156,8 @@ export default {
     },
     async create () {
       try {
-        let data = await Promise.all([
-          axios.post('/backend/recipes/', this.generatePostData()),
-          this.uploadImage()
-        ])[0]
+        let data = await axios.post('/backend/recipes/', this.generatePostData())
+        await this.uploadImage()
 
         this.$toast.success('Recipe created.')
         this.$router.push('/edit-recipe/' + data.id + '/')
