@@ -4,7 +4,7 @@
       <v-progress-circular indeterminate size="64"></v-progress-circular>
     </v-overlay>
 
-    <div v-if="data">
+    <div v-if="data" class="main">
       <h3>{{ edit ? "Editing recipe" : "New recipe"}}</h3>
 
       <v-form ref="form" v-model="valid">
@@ -30,17 +30,29 @@
         >
           <v-card-text>
             <v-row dense>
-              <v-col cols="6" md="2">
+              <v-col cols="4" md="2">
                 <v-text-field
                   dense
                   v-model="ingredient.quantity"
                   hide-details
                   single-line
                   type="number"
+                  label="Quantity"
                 />
               </v-col>
               <v-col cols="6" md="3">
-                <v-text-field dense v-model="ingredient.unit" hide-details single-line />
+                <v-text-field
+                  dense
+                  v-model="ingredient.unit"
+                  hide-details
+                  single-line
+                  label="Unit"
+                />
+              </v-col>
+              <v-col cols="2" md="1">
+                <v-btn small @click="removeIngredient(ingredient)" color="error darken-1">
+                  <v-icon>mdi-delete</v-icon>
+                </v-btn>
               </v-col>
               <v-col cols="12" md="6">
                 <v-text-field
@@ -48,26 +60,33 @@
                   v-model="ingredient.name"
                   hide-details
                   single-line
-                  @input="ingredientNamedChanged(ingredient)"
+                  label="Ingredient"
                 />
               </v-col>
             </v-row>
           </v-card-text>
         </v-card>
-        <v-row>
-          <v-col :cols="6">
-            <v-btn @click="$router.push('/recipe/'+editId)" block>
-              <v-icon>mdi-close</v-icon>
-            </v-btn>
-          </v-col>
-          <v-col :cols="6">
-            <v-btn :disabled="!valid" color="success" @click="createOrUpdate" block>
-              <v-icon>mdi-check</v-icon>
-            </v-btn>
-          </v-col>
-        </v-row>
+
+        <v-btn @click="addIngredient()" color="grey darken-2" block>
+          <v-icon>mdi-plus</v-icon>
+        </v-btn>
       </v-form>
     </div>
+
+    <v-footer fixed class="footer">
+      <v-row>
+        <v-col :cols="6" class="no-v-padding">
+          <v-btn @click="close" color="grey darken-3" block>
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
+        </v-col>
+        <v-col :cols="6" class="no-v-padding">
+          <v-btn :disabled="!valid" color="success" @click="createOrUpdate" block>
+            <v-icon>mdi-check</v-icon>
+          </v-btn>
+        </v-col>
+      </v-row>
+    </v-footer>
   </div>
 </template>
 
@@ -115,10 +134,6 @@ export default {
         ingredients: []
       }
     }
-
-    if (this.data.ingredients.length === 0) {
-      this.addIngredient()
-    }
   },
   methods: {
     async createOrUpdate () {
@@ -128,11 +143,16 @@ export default {
       } else {
         await this.create()
       }
+      this.goToRecipe()
       this.busy = false
     },
     async create () {
       try {
-        let data = (await axios.post('/backend/recipes/', this.generatePostData())).data
+        let data = await Promise.all([
+          axios.post('/backend/recipes/', this.generatePostData()),
+          this.uploadImage()
+        ])[0]
+
         this.$toast.success('Recipe created.')
         this.$router.push('/edit-recipe/' + data.id + '/')
       } catch (exc) {
@@ -142,19 +162,15 @@ export default {
     },
     async update () {
       try {
-        await axios.put('/backend/recipes/' + this.data.id + '/', this.generatePostData())
+        await Promise.all([
+          axios.patch('/backend/recipes/' + this.data.id + '/', this.generatePostData()),
+          this.uploadImage()
+        ])
+
         this.$toast.success('Recipe updated.')
       } catch (exc) {
         console.error(exc)
         this.$toast.error('Failed to update the recipe.')
-      }
-    },
-    ingredientNamedChanged (ingredient) {
-      if (ingredient.key !== this.data.ingredients[this.data.ingredients.length - 1].key) {
-        return
-      }
-      if (ingredient.name !== '') {
-        this.addIngredient()
       }
     },
     addIngredient () {
@@ -182,15 +198,30 @@ export default {
         ingredients.push(ingredient)
       }
 
-      const data = new FormData()
-      data.append('name', this.data.name)
-      data.append('description', this.data.description)
-      data.append('public', this.data.public)
-      data.append('ingredients', ingredients)
-      if (this.image) {
-        data.append('image', this.image, tools.uuid4() + '.png')
+      return {
+        name: this.data.name,
+        description: this.data.description,
+        public: this.data.public,
+        ingredients: ingredients
       }
-      return data
+    },
+    async uploadImage () {
+      if (!this.image) {
+        return
+      }
+      const data = new FormData()
+      data.append('image', this.image, tools.uuid4() + '.png')
+      await axios.patch('/backend/recipes/' + this.data.id + '/', data)
+    },
+    goToRecipe () {
+      this.$router.push('/recipe/' + this.editId)
+    },
+    close () {
+      if (this.editId) {
+        this.goToRecipe()
+      } else {
+        this.$router.push('/recipe-list')
+      }
     }
   },
   computed: {
@@ -202,4 +233,12 @@ export default {
 </script>
 
 <style scoped>
+.main {
+  padding-bottom: 100px;
+}
+
+.no-v-padding {
+  padding-top: 0px;
+  padding-bottom: 0px;
+}
 </style>

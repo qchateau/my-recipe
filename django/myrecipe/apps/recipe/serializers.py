@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
+from django.db import transaction
 
 from . import models
 
@@ -37,13 +38,18 @@ class RecipeSerializer(serializers.HyperlinkedModelSerializer):
         return recipe
 
     def update(self, instance, validated_data):
-        ingredients = validated_data.pop("ingredients")
+        ingredients = validated_data.pop("ingredients", None)
+        with transaction.atomic():
+            for k, v in validated_data.items():
+                setattr(instance, k, v)
+            instance.save()
 
-        for k, v in validated_data.items():
-            setattr(instance, k, v)
-        instance.save()
+            # ingredients is None only in the case of a patch which does not include it
+            if ingredients is not None:
+                instance.ingredients.all().delete()
+                for ingredient in ingredients:
+                    models.RecipeIngredient.objects.create(
+                        recipe=instance, **ingredient
+                    )
 
-        instance.ingredients.all().delete()
-        for ingredient in ingredients:
-            models.RecipeIngredient.objects.create(recipe=instance, **ingredient)
         return instance

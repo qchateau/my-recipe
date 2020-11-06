@@ -15,7 +15,7 @@ import UserPlugin from '@/js/user.js'
 axios.defaults.xsrfCookieName = 'csrftoken'
 axios.defaults.xsrfHeaderName = 'X-CSRFTOKEN'
 
-const vuetify = new Vuetify()
+const vuetify = new Vuetify({theme: { dark: true }})
 
 Vue.config.productionTip = false
 Vue.use(Vuetify)

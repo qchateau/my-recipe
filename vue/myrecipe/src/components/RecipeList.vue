@@ -6,7 +6,7 @@
 
     <v-text-field hide-details label="Search" v-model="nameSearch"></v-text-field>
 
-    <v-list dense>
+    <v-list dense v-if="filteredRecipeList.length > 0">
       <v-list-item
         v-for="recipe in filteredRecipeList"
         :key="'item'+recipe.id"
@@ -23,9 +23,16 @@
       </v-list-item>
     </v-list>
 
+    <div style="text-align: center; padding-top: 50px" v-else>
+      <div style>No recipes</div>
+    </div>
+
     <v-footer fixed>
       <div style="margin: auto">
-        <v-pagination v-model="currentPage" :length="Math.floor((recipeCount - 1) / pageSize) + 1"></v-pagination>
+        <v-pagination
+          v-model="currentPage"
+          :length="Math.max(1, Math.floor((recipeCount - 1) / pageSize) + 1)"
+        ></v-pagination>
       </div>
     </v-footer>
   </div>

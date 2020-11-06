@@ -1,5 +1,9 @@
 <template>
   <v-app>
+    <v-overlay :value="loading">
+      <v-progress-circular indeterminate size="64"></v-progress-circular>
+    </v-overlay>
+
     <v-app-bar app>
       <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
       <div>MyRecipe</div>
@@ -8,6 +12,7 @@
         <v-btn small text @click="logInOut">{{ $user.loggedIn() ?"Logout" : "Login"}}</v-btn>
       </div>
     </v-app-bar>
+
     <v-navigation-drawer app v-model="drawer" absolute temporary>
       <v-list nav dense>
         <v-list-item @click="drawer = false; $router.push('/recipe-list')">
@@ -23,10 +28,6 @@
         </v-list-item>
       </v-list>
     </v-navigation-drawer>
-
-    <v-overlay :value="loading">
-      <v-progress-circular indeterminate size="64"></v-progress-circular>
-    </v-overlay>
 
     <v-main>
       <v-container fluid>

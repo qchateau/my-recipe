@@ -15,7 +15,7 @@
           <img :src="data.image" width="256" style="border-radius: 5%" v-if="data.image" />
         </div>
 
-        <v-card id="ingredients-card" v-if="data.ingredients.length > 0" style="min-height: 45px">
+        <v-card id="ingredients-card" v-if="data.ingredients.length > 0">
           <div style="float: right; margin: 5px"></div>
           <ul>
             <li
@@ -30,38 +30,31 @@
 
       <v-speed-dial v-model="fab" bottom right fixed>
         <template v-slot:activator>
-          <v-btn v-model="fab" color="blue darken-2" dark fab>
+          <v-btn v-model="fab" color="blue darken-2" fab>
             <v-icon v-if="fab">mdi-close</v-icon>
             <v-icon v-else>mdi-plus</v-icon>
           </v-btn>
         </template>
 
-        <v-btn fab dark small color="indigo" @click="scaleDrawer = !scaleDrawer">
+        <v-btn fab small color="indigo" @click="scaleDrawer = !scaleDrawer">
           <v-icon>mdi-scale</v-icon>
         </v-btn>
 
-        <v-btn fab dark small color="indigo" @click="onShare" v-if="data.public">
+        <v-btn fab small color="indigo" @click="onShare" v-if="data.public">
           <v-icon>mdi-share</v-icon>
         </v-btn>
 
-        <v-btn
-          fab
-          dark
-          small
-          color="green"
-          @click="$router.push('/edit-recipe/'+id+'/')"
-          v-if="owner"
-        >
+        <v-btn fab small color="green" @click="$router.push('/edit-recipe/'+id+'/')" v-if="owner">
           <v-icon>mdi-playlist-edit</v-icon>
         </v-btn>
 
-        <v-btn fab dark small color="red" @click="deleteDialog = true" v-if="owner">
+        <v-btn fab small color="red" @click="deleteDialog = true" v-if="owner">
           <v-icon>mdi-delete</v-icon>
         </v-btn>
       </v-speed-dial>
     </div>
 
-    <v-navigation-drawer v-model="scaleDrawer" absolute temporary bottom height="30%">
+    <v-navigation-drawer v-model="scaleDrawer" fixed temporary bottom>
       <div style="margin: 10px">
         <h3>Scale quantities</h3>
         <v-text-field v-model="quantityScale" hide-details single-line type="number" />

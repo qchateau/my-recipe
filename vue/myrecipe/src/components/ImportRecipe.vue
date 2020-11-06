@@ -54,17 +54,18 @@ export default {
       let id = url.match(localRecipeUrlRegex)[1]
       let data = (await axios.get('/backend/recipes/' + id + '/')).data
 
-      const formData = new FormData()
-      for (const [key, value] of Object.entries(data)) {
-        if (key === 'image' && value !== null) {
-          let imageBlob = new Blob([(await axios.get(value, {responseType: 'blob'})).data])
-          formData.append(key, imageBlob, tools.uuid4() + '.png')
-        } else {
-          formData.append(key, value)
-        }
+      let imageFormData = null
+      if (data.image !== undefined) {
+        imageFormData = new FormData()
+        let imageBlob = new Blob([(await axios.get(data.image, {responseType: 'blob'})).data])
+        imageFormData.append('image', imageBlob, tools.uuid4() + '.png')
+        delete data.image
       }
 
-      await axios.post('/backend/recipes/', formData)
+      data = (await axios.post('/backend/recipes/', data)).data
+      if (imageFormData) {
+        await axios.patch(data.url, imageFormData)
+      }
       this.$router.push('/edit-recipe/' + id)
     }
   }
