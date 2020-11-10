@@ -25,7 +25,7 @@
           </ul>
         </v-card>
 
-        <div>{{ data.description }}</div>
+        <pre id="description">{{ data.description }}</pre>
       </v-card-text>
 
       <v-speed-dial v-model="fab" bottom right fixed>
@@ -130,7 +130,7 @@ ul {
 #ingredients-card {
   margin: 0px 10px 20px 10px;
 }
-#recipe-header {
-  text-align: center;
+#description {
+  font-family: Roboto;
 }
 </style>
