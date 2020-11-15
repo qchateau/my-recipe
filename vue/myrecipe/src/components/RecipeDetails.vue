@@ -57,7 +57,13 @@
     <v-navigation-drawer v-model="scaleDrawer" fixed temporary bottom>
       <div style="padding: 20px 10px 10px 10px">
         <span>
-          <v-text-field dense label="Scale" type="number" v-model="quantityScale" />
+          <v-text-field
+            dense
+            label="Scale"
+            type="number"
+            v-bind:value="Math.round(quantityScale*1000) / 1000"
+            v-on:input="quantityScale = $event"
+          />
         </span>
         <span v-if="data">
           <v-text-field
