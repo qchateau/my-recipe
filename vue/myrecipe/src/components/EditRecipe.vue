@@ -116,7 +116,6 @@ export default {
       valid: true,
       nameRules: [
         v => !!v || 'Name is required',
-        v => (v && v.length >= 10) || 'Name must be at least than 10 characters',
         v => (v && v.length <= 250) || 'Name must be less than 250 characters'
       ],
       busy: false,
