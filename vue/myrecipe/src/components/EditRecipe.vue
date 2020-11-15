@@ -155,7 +155,7 @@ export default {
     },
     async create () {
       try {
-        let data = await axios.post('/backend/recipes/', this.generatePostData())
+        let data = (await axios.post('/backend/recipes/', this.generatePostData())).data
         await this.uploadImage()
 
         this.$toast.success('Recipe created.')
