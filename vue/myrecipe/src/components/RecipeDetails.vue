@@ -90,6 +90,7 @@
 
 <script>
 import axios from 'axios'
+import StayAwake from '@/js/stayawake.js'
 
 export default {
   name: 'RecipeDetails',
@@ -104,6 +105,8 @@ export default {
     }
   },
   async mounted () {
+    StayAwake.enable()
+
     try {
       this.data = (await axios.get('/backend/recipes/' + this.id + '/')).data
       document.title = 'MyRecipe - ' + this.data.name
@@ -112,6 +115,9 @@ export default {
       this.$toast.error('Failed to get recipe.')
       this.$router.push('/')
     }
+  },
+  beforeDestroy () {
+    StayAwake.disable()
   },
   methods: {
     async doDelete () {

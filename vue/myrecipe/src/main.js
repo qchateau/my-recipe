@@ -7,10 +7,13 @@ import Vuetify from 'vuetify'
 import 'vuetify/dist/vuetify.min.css'
 
 import VuetifyToast from 'vuetify-toast-snackbar'
+import StayAwake from '@/js/stayawake.js'
 
 import App from './App'
 import router from './router'
 import UserPlugin from '@/js/user.js'
+
+StayAwake.init()
 
 axios.defaults.xsrfCookieName = 'csrftoken'
 axios.defaults.xsrfHeaderName = 'X-CSRFTOKEN'
