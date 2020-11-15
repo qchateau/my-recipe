@@ -19,7 +19,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
-    queryset = models.Recipe.objects.all().order_by("created_at")
+    queryset = models.Recipe.objects.all().order_by("name")
     serializer_class = serializers.RecipeSerializer
     permission_classes = [permissions.IsAuthenticated]
 
