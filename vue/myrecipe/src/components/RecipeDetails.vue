@@ -93,6 +93,7 @@ export default {
   async mounted () {
     try {
       this.data = (await axios.get('/backend/recipes/' + this.id + '/')).data
+      document.title = 'MyRecipe - ' + this.data.name
     } catch (exc) {
       console.error(exc)
       this.$toast.error('Failed to get recipe.')

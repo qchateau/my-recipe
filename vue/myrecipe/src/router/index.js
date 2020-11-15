@@ -11,34 +11,52 @@ export default new Router({
   routes: [
     {
       path: '/',
-      redirect: '/recipe-list'
+      redirect: '/recipe-list',
+      meta: {
+        title: 'MyRecipe'
+      }
     },
     {
       path: '/recipe-list',
       name: 'RecipeList',
-      component: RecipeList
+      component: RecipeList,
+      meta: {
+        title: 'MyRecipe - List'
+      }
     },
     {
       path: '/recipe/:id',
       name: 'RecipeDetails',
       component: RecipeDetails,
-      props: true
+      props: true,
+      meta: {
+        title: 'MyRecipe'
+      }
     },
     {
       path: '/new-recipe',
       name: 'NewRecipe',
-      component: EditRecipe
+      component: EditRecipe,
+      meta: {
+        title: 'MyRecipe - New'
+      }
     },
     {
       path: '/edit-recipe/:editId',
       name: 'EditRecipe',
       component: EditRecipe,
-      props: true
+      props: true,
+      meta: {
+        title: 'MyRecipe - Edit'
+      }
     },
     {
       path: '/import-recipe/',
       name: 'ImportRecipe',
-      component: ImportRecipe
+      component: ImportRecipe,
+      meta: {
+        title: 'MyRecipe - Import'
+      }
     }
   ]
 })
