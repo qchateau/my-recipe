@@ -23,8 +23,8 @@ Vue.use(UserPlugin)
 
 Vue.use(VuetifyToast, {
   $vuetify: vuetify.framework,
-  x: 'right',
-  y: 'bottom',
+  x: 'center',
+  y: 'top',
   color: 'info',
   icon: '',
   iconColor: '',
