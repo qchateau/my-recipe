@@ -6,7 +6,7 @@
 
     <v-app-bar app>
       <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
-      <div>MyRecipe</div>
+      <div style="cursor: pointer;" @click=" $router.push('/')">MyRecipe</div>
 
       <div style="text-align: right; width: 100%">
         <v-btn small text @click="logInOut">{{ $user.loggedIn() ?"Logout" : "Login"}}</v-btn>
@@ -29,6 +29,10 @@
 
         <v-list-item @click="drawer = false; $router.push('/import-recipe')">
           <v-list-item-title>Import recipe</v-list-item-title>
+        </v-list-item>
+
+        <v-list-item>
+          <h3>About</h3>
         </v-list-item>
 
         <v-list-item @click="openBugReport">
