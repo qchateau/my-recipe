@@ -132,5 +132,6 @@ ul {
 }
 #description {
   font-family: Roboto;
+  white-space: pre-wrap;
 }
 </style>
