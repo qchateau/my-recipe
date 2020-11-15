@@ -149,6 +149,8 @@ STATIC_ROOT = "/static/"
 MEDIA_URL = "/backend/media/"
 MEDIA_ROOT = "/media/"
 
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
 # Rest Framework
 
 REST_FRAMEWORK = {
