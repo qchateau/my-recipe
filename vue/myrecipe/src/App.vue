@@ -30,6 +30,14 @@
         <v-list-item @click="drawer = false; $router.push('/import-recipe')">
           <v-list-item-title>Import recipe</v-list-item-title>
         </v-list-item>
+
+        <v-list-item @click="openBugReport">
+          <v-list-item-title>Report a bug</v-list-item-title>
+        </v-list-item>
+
+        <v-list-item @click="openGitHub">
+          <v-list-item-title>GitHub</v-list-item-title>
+        </v-list-item>
       </v-list>
     </v-navigation-drawer>
 
@@ -73,6 +81,12 @@ export default {
       } else {
         this.logIn()
       }
+    },
+    openBugReport () {
+      window.open('https://github.com/qchateau/my-recipe/issues/new', '_blank').focus()
+    },
+    openGitHub () {
+      window.open('https://github.com/qchateau/my-recipe', '_blank').focus()
     }
   }
 }
