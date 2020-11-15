@@ -80,7 +80,7 @@
       </div>
     </v-navigation-drawer>
 
-    <v-dialog v-model="deleteDialog" persistent max-width="290">
+    <v-dialog v-model="deleteDialog" max-width="290">
       <v-card>
         <v-card-title class="headline">Delete recipe</v-card-title>
         <v-card-text>This will permanently delete the recipe.</v-card-text>
