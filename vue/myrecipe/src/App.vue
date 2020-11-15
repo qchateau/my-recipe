@@ -15,6 +15,10 @@
 
     <v-navigation-drawer app v-model="drawer" absolute temporary>
       <v-list nav dense>
+        <v-list-item>
+          <h3>Menu</h3>
+        </v-list-item>
+
         <v-list-item @click="drawer = false; $router.push('/recipe-list')">
           <v-list-item-title>Recipes</v-list-item-title>
         </v-list-item>
