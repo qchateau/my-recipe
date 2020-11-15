@@ -21,7 +21,7 @@
             <li
               v-for="ingredient in data.ingredients"
               :key="ingredient.id"
-            >{{ Math.round(ingredient.quantity * quantityScale * 100) / 100 }} {{ ingredient.unit }} {{ ingredient.name }}</li>
+            >{{ ingredientQuantity(ingredient) }} {{ ingredient.unit }} {{ ingredient.name }}</li>
           </ul>
         </v-card>
 
@@ -55,9 +55,22 @@
     </div>
 
     <v-navigation-drawer v-model="scaleDrawer" fixed temporary bottom>
-      <div style="margin: 10px">
-        <h3>Scale quantities</h3>
-        <v-text-field v-model="quantityScale" hide-details single-line type="number" />
+      <div style="padding: 20px 10px 10px 10px">
+        <span>
+          <v-text-field dense label="Scale" type="number" v-model="quantityScale" />
+        </span>
+        <span v-if="data">
+          <v-text-field
+            dense
+            type="number"
+            :label="ingredient.name"
+            :suffix="ingredient.unit"
+            :key="ingredient.id"
+            v-for="ingredient in data.ingredients"
+            v-bind:value="ingredientQuantity(ingredient)"
+            v-on:input="quantityScale = $event / ingredient.quantity"
+          ></v-text-field>
+        </span>
       </div>
     </v-navigation-drawer>
 
@@ -113,6 +126,9 @@ export default {
     async onShare () {
       await navigator.clipboard.writeText(location.href)
       this.$toast.success('Recipe URL copied to clipboard')
+    },
+    ingredientQuantity (ingredient) {
+      return Math.round(ingredient.quantity * this.quantityScale * 100) / 100
     }
   },
   computed: {
