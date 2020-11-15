@@ -40,14 +40,12 @@ export default {
     async doImportUrl () {
       this.loading = true
       try {
-        if (this.importUrl.match(localRecipeUrlRegex)) {
-          await this.importLocalRecipe(this.importUrl)
-        }
+        await this.importLocalRecipe(this.importUrl)
+        this.$toast.success('Recipe imported.')
       } catch (exc) {
         console.error(exc)
         this.$toast.error('Failed to import recipe.')
       }
-      this.$toast.success('Recipe imported.')
       this.loading = false
     },
     async importLocalRecipe (url) {
