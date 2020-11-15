@@ -41,7 +41,7 @@
         </v-btn>
 
         <v-btn fab small color="indigo" @click="onShare" v-if="data.public">
-          <v-icon>mdi-share</v-icon>
+          <v-icon>mdi-content-copy</v-icon>
         </v-btn>
 
         <v-btn fab small color="green" @click="$router.push('/edit-recipe/'+id+'/')" v-if="owner">

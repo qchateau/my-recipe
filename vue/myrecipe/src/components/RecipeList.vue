@@ -27,14 +27,22 @@
       <div style>No recipes</div>
     </div>
 
-    <v-footer fixed>
-      <div style="margin: auto">
-        <v-pagination
-          v-model="currentPage"
-          :length="Math.max(1, Math.floor((recipeCount - 1) / pageSize) + 1)"
-        ></v-pagination>
-      </div>
-    </v-footer>
+    <v-speed-dial v-model="fab" bottom right fixed>
+      <template v-slot:activator>
+        <v-btn v-model="fab" color="blue darken-2" fab>
+          <v-icon v-if="fab">mdi-close</v-icon>
+          <v-icon v-else>mdi-plus</v-icon>
+        </v-btn>
+      </template>
+
+      <v-btn fab small color="green" @click="$router.push('/new-recipe/')">
+        <v-icon>mdi-playlist-plus</v-icon>
+      </v-btn>
+
+      <v-btn fab small color="green" @click="$router.push('/import-recipe/')">
+        <v-icon>mdi-import</v-icon>
+      </v-btn>
+    </v-speed-dial>
   </div>
 </template>
 
@@ -47,16 +55,27 @@ export default {
     return {
       nameSearch: '',
       currentPage: 1,
-      pageSize: 1,
-      recipeCount: 0,
       recipeList: [],
-      loading: false
+      loading: false,
+      fab: false,
+      bottom: false
     }
   },
   async mounted () {
-    await this.loadPage(1)
+    window.addEventListener('scroll', () => {
+      this.bottom = this.bottomVisible()
+    })
+
+    await this.loadNext()
   },
   methods: {
+    bottomVisible () {
+      const scrollY = window.scrollY
+      const visible = document.documentElement.clientHeight
+      const pageHeight = document.documentElement.scrollHeight
+      const bottomOfPage = visible + scrollY >= pageHeight
+      return bottomOfPage || pageHeight < visible
+    },
     formatterDate (row, col, value) {
       const options = {dateStyle: 'medium'}
       return (new Date(value)).toLocaleDateString(navigator.language, options)
@@ -67,8 +86,9 @@ export default {
     onRowClick (row) {
       this.$router.push('recipe/' + row.id)
     },
-    async loadPage (page) {
+    async loadOnePage (page) {
       this.loading = true
+      let res = null
       try {
         let params = {
           page: page
@@ -76,22 +96,36 @@ export default {
         if (this.nameSearch.trim() !== '') {
           params['name-search'] = this.nameSearch.trim()
         }
-        let res = (await axios.get('/backend/recipes/', {params: params})).data
-        this.recipeCount = res.count
-        this.pageSize = Math.max(this.pageSize, res.results.length)
-        this.recipeList = res.results
+        res = (await axios.get('/backend/recipes/', {
+          params: params,
+          validateStatus: (status) => status === 200 || status === 404
+        })).data.results
       } catch (exc) {
         console.error(exc)
       }
       this.loading = false
+      return res || []
+    },
+    async loadNext () {
+      const next = await this.loadOnePage(this.currentPage++)
+      for (let recipe of next) {
+        this.recipeList.push(recipe)
+      }
+    },
+    async resetRecipeList () {
+      this.currentPage = 0
+      this.recipeList = []
+      await this.loadNext()
     }
   },
   watch: {
     async nameSearch () {
-      await this.loadPage(this.currentPage)
+      await this.resetRecipeList()
     },
-    async currentPage () {
-      await this.loadPage(this.currentPage)
+    async bottom () {
+      if (this.bottom) {
+        await this.loadNext()
+      }
     }
   },
   computed: {
