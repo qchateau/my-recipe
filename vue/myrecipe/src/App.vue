@@ -46,7 +46,7 @@
     </v-navigation-drawer>
 
     <v-main>
-      <v-container fluid style="max-width:1000px">
+      <v-container fluid id="main-container">
         <router-view></router-view>
       </v-container>
     </v-main>
@@ -97,4 +97,19 @@ export default {
 </script>
 
 <style>
+#main-container {
+  max-width: 1000px;
+}
+
+header div {
+  max-width: 1000px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+footer .row {
+  max-width: 1000px;
+  margin-left: auto;
+  margin-right: auto;
+}
 </style>
