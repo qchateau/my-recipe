@@ -6,7 +6,7 @@
 
     <h3>Import recipe</h3>
 
-    <v-form ref="form" v-model="valid">
+    <v-form ref="form" autocomplete="off" v-model="valid">
       <v-text-field v-model="importUrl" :rules="importUrlRules" label="URL" required></v-text-field>
 
       <v-btn :disabled="!valid" color="success" @click="doImportUrl" block>

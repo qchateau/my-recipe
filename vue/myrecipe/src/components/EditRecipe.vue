@@ -7,10 +7,17 @@
     <div v-if="data" class="main">
       <h3>{{ edit ? "Editing recipe" : "New recipe"}}</h3>
 
-      <v-form ref="form" v-model="valid">
+      <v-form ref="form" v-model="valid" autocomplete="off">
         <v-text-field v-model="data.name" :counter="250" :rules="nameRules" label="Name" required></v-text-field>
 
-        <v-textarea rows="1" auto-grow v-model="data.description" label="Description" required></v-textarea>
+        <v-textarea
+          rows="1"
+          auto-grow
+          v-model="data.description"
+          :rules="descriptionRules"
+          label="Description"
+          required
+        ></v-textarea>
 
         <v-file-input
           v-model="image"
@@ -117,6 +124,9 @@ export default {
       nameRules: [
         v => !!v || 'Name is required',
         v => (v && v.length <= 250) || 'Name must be less than 250 characters'
+      ],
+      descriptionRules: [
+        v => !!v || 'Description is required'
       ],
       busy: false,
       counter: 0

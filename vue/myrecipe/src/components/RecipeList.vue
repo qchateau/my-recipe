@@ -4,7 +4,7 @@
       <v-progress-circular indeterminate size="64"></v-progress-circular>
     </v-overlay>
 
-    <v-text-field hide-details label="Search" v-model="nameSearch"></v-text-field>
+    <v-text-field hide-details label="Search" v-model="nameSearch" autocomplete="off"></v-text-field>
 
     <v-list dense v-if="filteredRecipeList.length > 0">
       <v-list-item
