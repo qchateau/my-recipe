@@ -1,5 +1,12 @@
 <template>
   <v-app>
+    <v-overlay :value="!$user.loggedIn()">
+      <div style="text-align: center">
+        <p>Please login with a Google account</p>
+        <v-btn large @click="logInOut">{{ $user.loggedIn() ?"Logout" : "Login"}}</v-btn>
+      </div>
+    </v-overlay>
+
     <v-overlay :value="loading">
       <v-progress-circular indeterminate size="64"></v-progress-circular>
     </v-overlay>
@@ -45,7 +52,7 @@
       </v-list>
     </v-navigation-drawer>
 
-    <v-main>
+    <v-main v-if="$user.loggedIn()">
       <v-container fluid id="main-container">
         <router-view></router-view>
       </v-container>
