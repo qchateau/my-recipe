@@ -79,7 +79,7 @@ export default {
   methods: {
     logIn () {
       this.loading = true
-      location.href = '/backend/accounts/google/login/?next=' + location.href
+      location.href = '/backend/accounts/google/login/?next=' + encodeURIComponent(location.pathname + location.hash)
     },
     async logOut () {
       this.loading = true
