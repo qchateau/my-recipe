@@ -40,8 +40,12 @@
           <v-icon>mdi-scale</v-icon>
         </v-btn>
 
-        <v-btn fab small color="indigo" @click="onShare" v-if="data.public">
+        <v-btn fab small color="blue" @click="onShare" v-if="data.public">
           <v-icon>mdi-content-copy</v-icon>
+        </v-btn>
+
+        <v-btn fab small color="blue" @click="importDialog = true" v-if="data.public && !owner">
+          <v-icon>mdi-download</v-icon>
         </v-btn>
 
         <v-btn fab small color="green" @click="$router.push('/edit-recipe/'+id+'/')" v-if="owner">
@@ -80,6 +84,18 @@
       </div>
     </v-navigation-drawer>
 
+    <v-dialog v-model="importDialog" max-width="290">
+      <v-card>
+        <v-card-title class="headline">Import recipe</v-card-title>
+        <v-card-text>This will make a copy of this recipe in your own library.</v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn text @click="importDialog = false">Cancel</v-btn>
+          <v-btn color="green darken-1" text @click="doImport(); importDialog = false">Import</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
     <v-dialog v-model="deleteDialog" max-width="290">
       <v-card>
         <v-card-title class="headline">Delete recipe</v-card-title>
@@ -97,6 +113,7 @@
 <script>
 import axios from 'axios'
 import StayAwake from '@/js/stayawake.js'
+import tools from '@/js/tools.js'
 
 export default {
   name: 'RecipeDetails',
@@ -107,7 +124,8 @@ export default {
       quantityScale: 1,
       scaleDrawer: false,
       fab: false,
-      deleteDialog: false
+      deleteDialog: false,
+      importDialog: false
     }
   },
   async mounted () {
@@ -138,6 +156,16 @@ export default {
     async onShare () {
       await navigator.clipboard.writeText(location.href)
       this.$toast.success('Recipe URL copied to clipboard')
+    },
+    async doImport () {
+      try {
+        let data = await tools.importId(this.id)
+        this.$router.push('/recipe/' + data.id)
+      } catch (exc) {
+        console.error(exc)
+        this.$toast.error('Failed to import recipe.')
+      }
+      this.$toast.success('Recipe imported')
     },
     ingredientQuantity (ingredient) {
       return Math.round(ingredient.quantity * this.quantityScale * 100) / 100
