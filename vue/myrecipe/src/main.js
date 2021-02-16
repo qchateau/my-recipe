@@ -7,13 +7,11 @@ import Vuetify from 'vuetify'
 import 'vuetify/dist/vuetify.min.css'
 
 import VuetifyToast from 'vuetify-toast-snackbar'
-import StayAwake from '@/js/stayawake.js'
 
 import App from './App'
 import router from './router'
 import UserPlugin from '@/js/user.js'
-
-StayAwake.init()
+import NoSleepPlugin from '@/js/nosleep.js'
 
 axios.defaults.xsrfCookieName = 'csrftoken'
 axios.defaults.xsrfHeaderName = 'X-CSRFTOKEN'
@@ -23,6 +21,7 @@ const vuetify = new Vuetify({theme: { dark: true }})
 Vue.config.productionTip = false
 Vue.use(Vuetify)
 Vue.use(UserPlugin)
+Vue.use(NoSleepPlugin)
 
 Vue.use(VuetifyToast, {
   $vuetify: vuetify.framework,

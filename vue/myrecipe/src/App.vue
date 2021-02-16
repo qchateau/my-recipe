@@ -55,6 +55,18 @@
     <v-main v-if="$user.loggedIn()">
       <v-container fluid id="main-container">
         <router-view></router-view>
+
+        <v-btn
+          fab
+          x-small
+          bottom
+          left
+          fixed
+          :color="$nosleep.isEnabled() ? 'yellow' : 'grey'"
+          @click="$nosleep.toggle()"
+        >
+          <v-icon color="black">mdi-lightbulb-outline</v-icon>
+        </v-btn>
       </v-container>
     </v-main>
   </v-app>

@@ -26,6 +26,7 @@
         </v-card>
 
         <pre id="description">{{ data.description }}</pre>
+        <div style="min-height: 50px" />
       </v-card-text>
 
       <v-speed-dial v-model="fab" bottom right fixed>
@@ -112,7 +113,6 @@
 
 <script>
 import axios from 'axios'
-import StayAwake from '@/js/stayawake.js'
 import tools from '@/js/tools.js'
 
 export default {
@@ -129,8 +129,6 @@ export default {
     }
   },
   async mounted () {
-    StayAwake.enable()
-
     try {
       this.data = (await axios.get('/backend/recipes/' + this.id + '/')).data
       document.title = 'MyRecipe - ' + this.data.name
@@ -139,9 +137,6 @@ export default {
       this.$toast.error('Failed to get recipe.')
       this.$router.push('/')
     }
-  },
-  beforeDestroy () {
-    StayAwake.disable()
   },
   methods: {
     async doDelete () {
