@@ -50,7 +50,7 @@ export default {
     async importLocalRecipe (url) {
       let id = url.match(localRecipeUrlRegex)[1]
       let data = await tools.importId(id)
-      this.$router.push('/edit-recipe/' + data.id)
+      this.$router.push('/recipe/' + data.id)
     }
   }
 }
