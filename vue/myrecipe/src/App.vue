@@ -54,7 +54,7 @@
 
     <v-main v-if="$user.loggedIn()">
       <v-container fluid id="main-container">
-        <router-view></router-view>
+        <router-view :key="$route.fullPath"></router-view>
 
         <v-btn
           fab
