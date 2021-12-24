@@ -66,9 +66,13 @@ export default {
       this.bottom = this.bottomVisible()
     }
     window.addEventListener('scroll', refreshBottomStatus)
+    this.refreshBottomInterval = setInterval(refreshBottomStatus, 500)
     refreshBottomStatus()
 
     await this.loadNext()
+  },
+  unmounted () {
+    clearInterval(this.refreshBottomInterval)
   },
   methods: {
     bottomVisible () {
