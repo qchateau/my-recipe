@@ -84,7 +84,7 @@
           </v-card-text>
         </v-card>
 
-        <v-btn @click="addIngredient()" color="grey darken-2" block>
+        <v-btn @click="addIngredient($event)" color="grey darken-2" block>
           <v-icon>mdi-plus</v-icon>
         </v-btn>
       </v-form>
@@ -190,7 +190,7 @@ export default {
         this.$toast.error('Failed to update the recipe.')
       }
     },
-    addIngredient () {
+    addIngredient (event) {
       let key = this.counter++
       this.data.ingredients.push({
         key: key,
@@ -198,6 +198,10 @@ export default {
         unit: '',
         name: ''
       })
+      if (event) {
+        // Prevent loss of focus (would make the keyboard disappear on mobile)
+        event.preventDefault()
+      }
       this.$nextTick(() => {
         const el = this.$refs['ingredientCard-' + key][0].$el
         el.scrollIntoView({ behavior: 'smooth' })
