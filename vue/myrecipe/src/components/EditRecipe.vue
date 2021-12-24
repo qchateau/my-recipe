@@ -202,10 +202,10 @@ export default {
         // Prevent loss of focus (would make the keyboard disappear on mobile)
         event.preventDefault()
       }
-      this.$nextTick(() => {
+      setTimeout(() => {
         const el = this.$refs['ingredientCard-' + key][0].$el
         el.scrollIntoView({ behavior: 'smooth' })
-      })
+      }, 200)
     },
     removeIngredient (ingredient) {
       if (this.data.ingredients.length === 0) {
