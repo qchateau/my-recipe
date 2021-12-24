@@ -86,12 +86,10 @@
         <v-btn @click="addIngredient()" color="grey darken-2" block>
           <v-icon>mdi-plus</v-icon>
         </v-btn>
-
-        <span ref="ingredientPadding" :style="'display: inline-block; height: ' + this.ingredientPaddingHeight + 'px'" />
       </v-form>
     </div>
 
-    <v-footer fixed class="footer" ref="footer">
+    <v-footer fixed class="footer">
       <v-row>
         <v-col :cols="6" class="no-v-padding">
           <v-btn @click="close" color="grey darken-3" block>
@@ -132,8 +130,7 @@ export default {
         v => !!v || 'Description is required'
       ],
       busy: false,
-      counter: 0,
-      ingredientPaddingHeight: 0
+      counter: 0
     }
   },
   async mounted () {
@@ -155,8 +152,6 @@ export default {
         ingredients: []
       }
     }
-    const footer = this.$refs.footer.$el
-    this.ingredientPaddingHeight = footer.clientHeight + 5
   },
   methods: {
     async createOrUpdate () {
@@ -201,10 +196,6 @@ export default {
         quantity: 0,
         unit: '',
         name: ''
-      })
-      this.$nextTick(() => {
-        const el = this.$refs.ingredientPadding
-        el.scrollIntoView({ block: 'end', inline: 'nearest', behavior: 'smooth' })
       })
     },
     removeIngredient (ingredient) {
