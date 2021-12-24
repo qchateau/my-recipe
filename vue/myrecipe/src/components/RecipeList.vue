@@ -62,9 +62,11 @@ export default {
     }
   },
   async mounted () {
-    window.addEventListener('scroll', () => {
+    const refreshBottomStatus = () => {
       this.bottom = this.bottomVisible()
-    })
+    }
+    window.addEventListener('scroll', refreshBottomStatus)
+    refreshBottomStatus()
 
     await this.loadNext()
   },
