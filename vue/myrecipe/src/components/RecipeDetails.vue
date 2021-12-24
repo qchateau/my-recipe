@@ -108,6 +108,18 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+
+    <v-btn
+      fab
+      x-small
+      bottom
+      left
+      fixed
+      :color="$nosleep.isEnabled() ? 'yellow' : 'grey'"
+      @click="$nosleep.toggle()"
+    >
+      <v-icon color="black">mdi-lightbulb-outline</v-icon>
+    </v-btn>
   </div>
 </template>
 
