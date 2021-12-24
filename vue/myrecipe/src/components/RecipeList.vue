@@ -76,11 +76,7 @@ export default {
   },
   methods: {
     bottomVisible () {
-      const scrollY = window.scrollY
-      const visible = document.documentElement.clientHeight
-      const pageHeight = document.documentElement.scrollHeight
-      const bottomOfPage = visible + scrollY >= pageHeight
-      return bottomOfPage || pageHeight < visible
+      return Math.max(window.pageYOffset, document.documentElement.scrollTop, document.body.scrollTop) + window.innerHeight === document.documentElement.offsetHeight
     },
     formatterDate (row, col, value) {
       const options = {dateStyle: 'medium'}
