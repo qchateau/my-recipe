@@ -34,6 +34,7 @@
           style="margin: 5px 0px"
           v-for="ingredient in data.ingredients"
           :key="ingredient.key"
+          :ref="'ingredientCard-' + ingredient.key"
         >
           <v-card-text>
             <v-row dense>
@@ -196,6 +197,10 @@ export default {
         quantity: 0,
         unit: '',
         name: ''
+      })
+      this.$nextTick(() => {
+        const el = this.$refs['ingredientCard-' + key][0].$el
+        el.scrollIntoView({ behavior: 'smooth' })
       })
     },
     removeIngredient (ingredient) {
