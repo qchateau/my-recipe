@@ -45,6 +45,7 @@
                   single-line
                   type="number"
                   label="Quantity"
+                  autofocus
                 />
               </v-col>
               <v-col cols="6" md="3">
