@@ -48,7 +48,7 @@
                   single-line
                   type="number"
                   label="Quantity"
-                  autofocus
+                  :autofocus="autofocus && ingredient.key === (counter - 1)"
                 />
               </v-col>
               <v-col cols="6" md="3">
@@ -134,7 +134,8 @@ export default {
         v => !!v || 'Description is required'
       ],
       busy: false,
-      counter: 0
+      counter: 0,
+      autofocus: true
     }
   },
   async mounted () {
@@ -201,6 +202,7 @@ export default {
         unit: '',
         name: ''
       })
+      this.autofocus = true
       if (event) {
         // Prevent loss of focus (would make the keyboard disappear on mobile)
         event.preventDefault()
@@ -208,6 +210,7 @@ export default {
       this.$nextTick(() => {
         const el = this.$refs['ingredientCard-' + key][0].$el
         el.scrollIntoView()
+        this.autofocus = false
       })
     },
     removeIngredient (ingredient) {
