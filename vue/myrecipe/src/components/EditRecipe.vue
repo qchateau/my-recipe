@@ -42,6 +42,8 @@
                 <v-text-field
                   dense
                   v-model="ingredient.quantity"
+                  :value="ingredient.quantity"
+                  @input="ingredient.quantity = parseFloat($event)"
                   hide-details
                   single-line
                   type="number"
@@ -52,7 +54,8 @@
               <v-col cols="6" md="3">
                 <v-text-field
                   dense
-                  v-model="ingredient.unit"
+                  :value="ingredient.unit.toLowerCase()"
+                  @input="ingredient.unit = $event.toLowerCase()"
                   hide-details
                   single-line
                   label="Unit"
@@ -259,7 +262,7 @@ export default {
 
 <style scoped>
 .main {
-  padding-bottom: 100px;
+  padding-bottom: 80px;
 }
 
 .no-v-padding {
