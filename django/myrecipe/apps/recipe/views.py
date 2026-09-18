@@ -1,10 +1,18 @@
-from rest_framework import viewsets
-from rest_framework import permissions
-from rest_framework.response import Response
-from rest_framework.decorators import action
+import logging
+
 from django.contrib.auth import get_user_model
+from rest_framework import permissions, status, viewsets
+from rest_framework.decorators import action
+from rest_framework.response import Response
 
 from . import models, serializers
+from .services.extractor import (
+    ExtractionConfigError,
+    ExtractionError,
+    extract_recipe_from_url,
+)
+
+logger = logging.getLogger(__name__)
 
 User = get_user_model()
 
@@ -62,6 +70,35 @@ class RecipeViewSet(viewsets.ModelViewSet):
         if name_search is not None:
             queryset = queryset.filter(name__icontains=name_search)
         return queryset
+
+    @action(
+        detail=False,
+        methods=["post"],
+        url_path="extract-url",
+        permission_classes=[permissions.IsAuthenticated],
+    )
+    def extract_url(self, request):
+        url = request.data.get("url")
+        if not url:
+            return Response(
+                {"detail": "URL is required."}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            recipe_data = extract_recipe_from_url(url)
+            return Response(recipe_data)
+        except ExtractionConfigError as exc:
+            return Response(
+                {"detail": str(exc)}, status=status.HTTP_503_SERVICE_UNAVAILABLE
+            )
+        except ExtractionError as exc:
+            return Response({"detail": str(exc)}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception:
+            logger.exception("Unexpected error during recipe extraction")
+            return Response(
+                {"detail": "An unexpected error occurred while extracting the recipe."},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
 
 
 class RecipeIngredientViewSet(viewsets.ModelViewSet):

@@ -5,11 +5,22 @@
     </v-overlay>
 
     <h3>Import recipe</h3>
+    <p class="subtitle-2 text--secondary">
+      Paste a MyRecipe link or any recipe webpage URL to extract and create a recipe.
+    </p>
 
     <v-form ref="form" autocomplete="off" v-model="valid">
-      <v-text-field v-model="importUrl" :rules="importUrlRules" label="URL" required></v-text-field>
+      <v-text-field
+        v-model="importUrl"
+        :rules="importUrlRules"
+        label="URL"
+        placeholder="https://..."
+        hint="Supports MyRecipe links and external cooking recipe web pages"
+        persistent-hint
+        required
+      ></v-text-field>
 
-      <v-btn :disabled="!valid" color="success" @click="doImportUrl" block>
+      <v-btn :disabled="!valid" color="success" @click="doImportUrl" block class="mt-4">
         <v-icon>mdi-check</v-icon>
       </v-btn>
     </v-form>
@@ -17,6 +28,7 @@
 </template>
 
 <script>
+import axios from 'axios'
 import tools from '@/js/tools.js'
 
 const localRecipeUrlRegexPattern = window.location.origin.replaceAll('/', '\\/').replaceAll('.', '\\.') + '.*\\/recipe\\/(.*)(\\/.*)?'
@@ -31,7 +43,7 @@ export default {
       importUrl: '',
       importUrlRules: [
         v => !!v || 'URL is required',
-        v => !!v.match(localRecipeUrlRegex) || 'URL not supported'
+        v => /^https?:\/\/.+/i.test(v) || 'Must be a valid HTTP or HTTPS URL'
       ]
     }
   },
@@ -39,13 +51,24 @@ export default {
     async doImportUrl () {
       this.loading = true
       try {
-        await this.importLocalRecipe(this.importUrl)
-        this.$toast.success('Recipe imported.')
+        if (localRecipeUrlRegex.test(this.importUrl)) {
+          await this.importLocalRecipe(this.importUrl)
+          this.$toast.success('Recipe imported.')
+        } else {
+          let res = await axios.post('/backend/recipes/extract-url/', { url: this.importUrl })
+          sessionStorage.setItem('prefillRecipe', JSON.stringify(res.data))
+          this.$toast.success('Recipe extracted! Please review and save.')
+          this.$router.push('/new-recipe')
+        }
       } catch (exc) {
         console.error(exc)
-        this.$toast.error('Failed to import recipe.')
+        let errorMsg = exc.response && exc.response.data && exc.response.data.detail
+          ? exc.response.data.detail
+          : 'Failed to import recipe.'
+        this.$toast.error(errorMsg)
+      } finally {
+        this.loading = false
       }
-      this.loading = false
     },
     async importLocalRecipe (url) {
       let id = url.match(localRecipeUrlRegex)[1]
