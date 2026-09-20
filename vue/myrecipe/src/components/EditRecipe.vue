@@ -153,7 +153,7 @@ export default {
   name: 'EditRecipe',
   props: {
     editId: {
-      default: false
+      default: ''
     }
   },
   data () {
@@ -176,7 +176,7 @@ export default {
     }
   },
   async mounted () {
-    if (this.edit) {
+    if (this.editId) {
       try {
         this.data = (await axios.get('/backend/recipes/' + this.editId + '/')).data
       } catch (exc) {
@@ -252,19 +252,19 @@ export default {
       this.busy = true
       if (this.edit) {
         await this.update()
+        this.goToRecipe(this.editId)
       } else {
-        await this.create()
+        let data = await this.create()
+        this.goToRecipe(data.id)
       }
-      this.goToRecipe()
       this.busy = false
     },
     async create () {
       try {
         let data = (await axios.post('/backend/recipes/', this.generatePostData())).data
         await this.uploadImage()
-
         this.$toast.success('Recipe created.')
-        this.$router.push('/edit-recipe/' + data.id + '/')
+        return data
       } catch (exc) {
         console.error(exc)
         this.$toast.error('Failed to create the recipe.')
@@ -333,12 +333,12 @@ export default {
       data.append('image', this.image, tools.uuid4() + '.png')
       await axios.patch('/backend/recipes/' + this.data.id + '/', data)
     },
-    goToRecipe () {
-      this.$router.push('/recipe/' + this.editId)
+    goToRecipe (editId) {
+      this.$router.push('/recipe/' + editId)
     },
     close () {
       if (this.editId) {
-        this.goToRecipe()
+        this.goToRecipe(this.editId)
       } else {
         this.$router.push('/recipe-list')
       }
@@ -346,7 +346,7 @@ export default {
   },
   computed: {
     edit () {
-      return this.editId !== false
+      return this.editId !== ''
     }
   }
 }
