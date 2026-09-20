@@ -4,8 +4,6 @@ on:
   push:
     branches:
       - master
-    tags:
-      - "v*"
   pull_request:
     branches:
       - master
@@ -28,6 +26,8 @@ jobs:
             context: ./django
           - name: frontend
             context: ./vue
+          - name: nginx
+            context: ./nginx
 
     steps:
       - name: Checkout repository

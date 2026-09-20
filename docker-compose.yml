@@ -9,7 +9,7 @@ volumes:
 services:
   nginx:
     restart: always
-    image: nginx:1.19
+    image: ghcr.io/qchateau/my-recipe-nginx:latest
     volumes:
       - django:/shared/
       - django_static:/backend_static/
@@ -25,21 +25,14 @@ services:
   frontend:
     restart: always
     image: ghcr.io/qchateau/my-recipe-frontend:latest
-    build:
-      context: ./vue/
     environment:
       - DEBUG=${DEBUG:?Debug is not set}
-    volumes:
-      - ./vue/myrecipe/:/devcode/
-      - /devcode/node_modules # otherwise we will override the image node_modules with our own
     command: sh -c '
       if [ "$DEBUG" -eq "1" ]; then cd /devcode/ && npm install && npm run dev; else http-server /code/dist; fi'
 
   backend:
     restart: always
     image: ghcr.io/qchateau/my-recipe-backend:latest
-    build:
-      context: ./django/
     environment:
       - DJANGO_DEBUG=${DEBUG:?Debug is not set}
       - DJANGO_SECRET=${DJANGO_SECRET:?Django secret is not set}
@@ -53,7 +46,6 @@ services:
       - django:/shared/
       - django_static:/static/
       - django_media:/media/
-      - ./django/:/code/:rw # to write migrations on host project
     depends_on:
       - db
     command: sh -c '

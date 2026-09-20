@@ -1,0 +1,21 @@
+version: "3.2"
+
+services:
+  nginx:
+    build:
+      context: ./nginx/
+
+  frontend:
+    build:
+      context: ./vue/
+    volumes:
+      - ./vue/myrecipe/:/devcode/
+      - /devcode/node_modules # otherwise we will override the image node_modules with our own
+
+  backend:
+    build:
+      context: ./django/
+    volumes:
+      - ./django/:/code/:rw # to write migrations on host project
+    depends_on:
+      - db
