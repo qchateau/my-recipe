@@ -56,7 +56,7 @@ To enable auto-filling recipes directly from web page URLs:
 Start all services with Docker Compose:
 
 ```bash
-docker compose up -d --build
+docker compose -f docker-compose.yml -f docker-compose-dev.yml up -d
 ```
 
 Access the application at `http://localhost:8080` (or your configured `HTTP_PORT`).
