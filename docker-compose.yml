@@ -24,7 +24,7 @@ services:
 
   frontend:
     restart: always
-    image: myrecipe/frontend:latest
+    image: ghcr.io/qchateau/my-recipe-frontend:latest
     build:
       context: ./vue/
     environment:
@@ -37,7 +37,7 @@ services:
 
   backend:
     restart: always
-    image: myrecipe/backend:latest
+    image: ghcr.io/qchateau/my-recipe-backend:latest
     build:
       context: ./django/
     environment:
