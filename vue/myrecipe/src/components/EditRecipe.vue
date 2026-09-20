@@ -7,6 +7,41 @@
     <div v-if="data" class="main">
       <h3>{{ edit ? "Editing recipe" : "New recipe"}}</h3>
 
+      <v-card class="mb-4 mt-2" outlined v-if="!edit">
+        <v-card-text>
+          <div class="subtitle-2 font-weight-bold mb-2">
+            <v-icon small left color="primary">mdi-auto-fix</v-icon>
+            Auto-fill from Web Page
+          </div>
+          <v-row dense align="center">
+            <v-col cols="12" sm="9">
+              <v-text-field
+                v-model="importUrl"
+                label="Recipe web page URL"
+                placeholder="https://..."
+                outlined
+                dense
+                hide-details
+                :disabled="extracting"
+                @keyup.enter="extractFromUrl"
+              />
+            </v-col>
+            <v-col cols="12" sm="3">
+              <v-btn
+                color="primary"
+                block
+                :loading="extracting"
+                :disabled="!importUrl || extracting"
+                @click="extractFromUrl"
+              >
+                <v-icon left>mdi-download</v-icon>
+                Extract
+              </v-btn>
+            </v-col>
+          </v-row>
+        </v-card-text>
+      </v-card>
+
       <v-form ref="form" v-model="valid" autocomplete="off">
         <v-text-field v-model="data.name" :counter="250" :rules="nameRules" label="Name" required></v-text-field>
 
@@ -118,7 +153,7 @@ export default {
   name: 'EditRecipe',
   props: {
     editId: {
-      default: false
+      default: ''
     }
   },
   data () {
@@ -135,11 +170,13 @@ export default {
       ],
       busy: false,
       counter: 0,
-      autofocus: true
+      autofocus: true,
+      importUrl: '',
+      extracting: false
     }
   },
   async mounted () {
-    if (this.edit) {
+    if (this.editId) {
       try {
         this.data = (await axios.get('/backend/recipes/' + this.editId + '/')).data
       } catch (exc) {
@@ -156,26 +193,78 @@ export default {
         public: true,
         ingredients: []
       }
+      this.checkPrefill()
     }
   },
   methods: {
+    checkPrefill () {
+      let prefillRaw = sessionStorage.getItem('prefillRecipe')
+      if (prefillRaw) {
+        sessionStorage.removeItem('prefillRecipe')
+        try {
+          let prefill = JSON.parse(prefillRaw)
+          this.populateExtractedData(prefill)
+        } catch (e) {
+          console.error(e)
+        }
+      }
+    },
+    populateExtractedData (extracted) {
+      if (!extracted) {
+        return
+      }
+      if (extracted.name) {
+        this.data.name = extracted.name
+      }
+      if (extracted.description) {
+        this.data.description = extracted.description
+      }
+      if (Array.isArray(extracted.ingredients) && extracted.ingredients.length > 0) {
+        this.data.ingredients = extracted.ingredients.map(ing => ({
+          key: this.counter++,
+          name: ing.name || '',
+          quantity: typeof ing.quantity === 'number' ? ing.quantity : 1,
+          unit: ing.unit || ''
+        }))
+      }
+    },
+    async extractFromUrl () {
+      if (!this.importUrl) {
+        return
+      }
+      this.extracting = true
+      try {
+        let res = await axios.post('/backend/recipes/extract-url/', { url: this.importUrl })
+        this.populateExtractedData(res.data)
+        this.$toast.success('Recipe pre-filled! You can now review and adjust before saving.')
+        this.importUrl = ''
+      } catch (exc) {
+        console.error(exc)
+        let errorMsg = exc.response && exc.response.data && exc.response.data.detail
+          ? exc.response.data.detail
+          : 'Failed to extract recipe from URL.'
+        this.$toast.error(errorMsg)
+      } finally {
+        this.extracting = false
+      }
+    },
     async createOrUpdate () {
       this.busy = true
       if (this.edit) {
         await this.update()
+        this.goToRecipe(this.editId)
       } else {
-        await this.create()
+        let data = await this.create()
+        this.goToRecipe(data.id)
       }
-      this.goToRecipe()
       this.busy = false
     },
     async create () {
       try {
         let data = (await axios.post('/backend/recipes/', this.generatePostData())).data
         await this.uploadImage()
-
         this.$toast.success('Recipe created.')
-        this.$router.push('/edit-recipe/' + data.id + '/')
+        return data
       } catch (exc) {
         console.error(exc)
         this.$toast.error('Failed to create the recipe.')
@@ -244,12 +333,12 @@ export default {
       data.append('image', this.image, tools.uuid4() + '.png')
       await axios.patch('/backend/recipes/' + this.data.id + '/', data)
     },
-    goToRecipe () {
-      this.$router.push('/recipe/' + this.editId)
+    goToRecipe (editId) {
+      this.$router.push('/recipe/' + editId)
     },
     close () {
       if (this.editId) {
-        this.goToRecipe()
+        this.goToRecipe(this.editId)
       } else {
         this.$router.push('/recipe-list')
       }
@@ -257,7 +346,7 @@ export default {
   },
   computed: {
     edit () {
-      return this.editId !== false
+      return this.editId !== ''
     }
   }
 }

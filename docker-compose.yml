@@ -45,6 +45,8 @@ services:
       - DJANGO_SECRET=${DJANGO_SECRET:?Django secret is not set}
       - GOOGLE_AUTH_CLIENT_ID=${GOOGLE_AUTH_CLIENT_ID:?Google auth client ID is not set}
       - GOOGLE_AUTH_SECRET=${GOOGLE_AUTH_SECRET:?Google auth secret is not set}
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+      - GEMINI_MODEL=${GEMINI_MODEL:-gemini-flash-lite-latest}
       - POSTGRES_USER=${POSTGRES_USER:-postgres}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
     volumes:
